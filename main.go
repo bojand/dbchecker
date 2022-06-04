@@ -24,10 +24,10 @@ func main() {
 	})
 
 	http.HandleFunc("/mysql", func(w http.ResponseWriter, r *http.Request) {
-		uri := os.Getenv("DATABASE_URL")
+		uri := os.Getenv("MYSQL_URL")
 		if uri == "" {
 			w.WriteHeader(http.StatusNotImplemented)
-			fmt.Fprint(w, "no DATABASE_URL env var")
+			fmt.Fprint(w, "no MYSQL_URL env var")
 			return
 		}
 
@@ -50,10 +50,10 @@ func main() {
 	})
 
 	http.HandleFunc("/redis", func(w http.ResponseWriter, r *http.Request) {
-		uri := os.Getenv("DATABASE_URL")
+		uri := os.Getenv("REDIS_URL")
 		if uri == "" {
 			w.WriteHeader(http.StatusNotImplemented)
-			fmt.Fprint(w, "no DATABASE_URL env var")
+			fmt.Fprint(w, "no REDIS_URL env var")
 			return
 		}
 
@@ -79,10 +79,10 @@ func main() {
 	})
 
 	http.HandleFunc("/mongo", func(w http.ResponseWriter, r *http.Request) {
-		uri := os.Getenv("DATABASE_URL")
+		uri := os.Getenv("MONGODB_URL")
 		if uri == "" {
 			w.WriteHeader(http.StatusNotImplemented)
-			fmt.Fprint(w, "no DATABASE_URL env var")
+			fmt.Fprint(w, "no MONGODB_URL env var")
 			return
 		}
 
