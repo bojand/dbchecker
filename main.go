@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+
+	"github.com/xo/dburl"
 
 	"github.com/gomodule/redigo/redis"
 
@@ -31,7 +34,19 @@ func main() {
 			return
 		}
 
-		db, err := sql.Open("mysql", uri)
+		dbURL, err := dburl.Parse(uri)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, "parsting MYSQL_URL")
+			return
+		}
+
+		dbPassword, _ := dbURL.User.Password()
+		dbName := strings.Trim(dbURL.Path, "/")
+		connectionString := fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=utf8&parseTime=true",
+			dbURL.User.Username(), dbPassword, dbURL.Hostname(), dbURL.Port(), dbName)
+
+		db, err := sql.Open("mysql", connectionString)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(w, "error connecting to the database: "+err.Error())
@@ -46,7 +61,7 @@ func main() {
 			return
 		}
 
-		fmt.Fprint(w, "Successfully connected and pinged.")
+		fmt.Fprint(w, "Successfully connected and pinged mysql.")
 	})
 
 	http.HandleFunc("/redis", func(w http.ResponseWriter, r *http.Request) {
@@ -75,7 +90,7 @@ func main() {
 			return
 		}
 
-		fmt.Fprint(w, "Successfully connected and pinged.")
+		fmt.Fprint(w, "Successfully connected and pinged redis.")
 	})
 
 	http.HandleFunc("/mongo", func(w http.ResponseWriter, r *http.Request) {
@@ -106,7 +121,7 @@ func main() {
 			return
 		}
 
-		fmt.Fprint(w, "Successfully connected and pinged.")
+		fmt.Fprint(w, "Successfully connected and pinged mongo.")
 	})
 
 	port := os.Getenv("PORT")

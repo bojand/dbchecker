@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gomodule/redigo v1.8.8
+	github.com/xo/dburl v0.10.0
 	go.mongodb.org/mongo-driver v1.9.1
 )
 
