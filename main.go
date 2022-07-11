@@ -6,12 +6,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
-
-	"github.com/xo/dburl"
+	_ "github.com/lib/pq"
 
 	"github.com/gomodule/redigo/redis"
 
@@ -26,27 +23,15 @@ func main() {
 		fmt.Fprintf(w, "Hello! you've requested %s\n", r.URL.Path)
 	})
 
-	http.HandleFunc("/mysql", func(w http.ResponseWriter, r *http.Request) {
-		uri := os.Getenv("MYSQL_URL")
-		if uri == "" {
+	http.HandleFunc("/postgres", func(w http.ResponseWriter, r *http.Request) {
+		connectionString := os.Getenv("POSTGRES_URL")
+		if connectionString == "" {
 			w.WriteHeader(http.StatusNotImplemented)
-			fmt.Fprint(w, "no MYSQL_URL env var")
+			fmt.Fprint(w, "no POSTGRES_URL env var")
 			return
 		}
 
-		dbURL, err := dburl.Parse(uri)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, "parsting MYSQL_URL")
-			return
-		}
-
-		dbPassword, _ := dbURL.User.Password()
-		dbName := strings.Trim(dbURL.Path, "/")
-		connectionString := fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=utf8&parseTime=true",
-			dbURL.User.Username(), dbPassword, dbURL.Hostname(), dbURL.Port(), dbName)
-
-		db, err := sql.Open("mysql", connectionString)
+		db, err := sql.Open("postgres", connectionString)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(w, "error connecting to the database: "+err.Error())
@@ -61,7 +46,7 @@ func main() {
 			return
 		}
 
-		fmt.Fprint(w, "Successfully connected and pinged mysql.")
+		fmt.Fprint(w, "Successfully connected and pinged postgres.")
 	})
 
 	http.HandleFunc("/redis", func(w http.ResponseWriter, r *http.Request) {
