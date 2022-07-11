@@ -37,7 +37,7 @@ func main() {
 		dbURL, err := dburl.Parse(uri)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, "parsting MYSQL_URL")
+			fmt.Fprint(w, "parsing MYSQL_URL")
 			return
 		}
 
